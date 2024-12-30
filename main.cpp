@@ -10,7 +10,7 @@ int main() {
 
 	std::cout << "Rank is " << r.value() << std::endl;
 
-
+  
 
   
 
