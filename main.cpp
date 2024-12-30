@@ -384,9 +384,9 @@ int main() {
 
   Deck d;
 
-  vector<int> flop1 = string_to_hand("JcQcKc");
-  vector<int> flop2 = string_to_hand("JhQhKh");
-  vector<int> hand = string_to_hand("AhThAcTc");
+  vector<int> flop1 = string_to_hand("JcQdKc");
+  vector<int> flop2 = string_to_hand("8s2h5s");
+  vector<int> hand = string_to_hand("2d2c9hTc");
 
   d.erase(flop1);
   d.erase(flop2);
