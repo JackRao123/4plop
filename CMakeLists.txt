@@ -1,15 +1,22 @@
 cmake_minimum_required(VERSION 3.16)
 project(4plop)
 
-# Set the C++ standard
+# Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add the submodule directory
-add_subdirectory(hand_evaluator)
+# Add the phevaluator library
+add_subdirectory(phevaluator)
 
-# Add the executable target
+# Add the main executable
 add_executable(4plop main.cpp)
 
-# Link the hand_evaluator library to the executable
-target_link_libraries(4plop PRIVATE hand_evaluator)
+
+
+
+# Link the phevaluator library to the executable
+target_link_libraries(4plop PRIVATE phevaluator)
+
+
+# Set the default startup project for Visual Studio
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT 4plop)

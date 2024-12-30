@@ -19,8 +19,15 @@ set(SOURCES
     src/hash.cpp
 )
 
+# Define the phevaluator library
+add_library(phevaluator STATIC ${SOURCES})
+
+# Include directories for the library
+target_include_directories(phevaluator PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 # Include directories
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
 
 # Add the main executable
-add_executable(phevaluator_main main.cpp ${SOURCES})
+# add_executable(phevaluator_main main.cpp ${SOURCES})
