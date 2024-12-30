@@ -7,16 +7,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Source files
 set(SOURCES
-    dptables.cpp
-    evaluation_plo4.cpp
-    hash.cpp
-    tables_plo4.cpp
-    card_sampler.cpp
-    evaluator_plo4.cpp
-    tables_bitwise.cpp
-    hashtable.cpp
+    tables/dptables.cpp
+    tables/hashtable.cpp
+    tables/tables_bitwise.cpp
+    tables/tables_plo4.cpp
+
     kev/fast_eval.c
     kev/kev_eval.c
+
+    src/card_sampler.cpp
+    src/evaluator_plo4.cpp
+    src/hash.cpp
 )
 
 # Include directories

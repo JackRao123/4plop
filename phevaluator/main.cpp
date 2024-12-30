@@ -1,6 +1,6 @@
 #include <iostream>
-#include <phevaluator.h>
-#include <rank.h>
+#include <include/phevaluator.h>
+#include <include/rank.h>
 
 int main() {
   // Example usage of phevaluator
