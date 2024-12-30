@@ -100,6 +100,78 @@ string hand_to_string(const vector<int> &hand) {
   return s;
 }
 
+// this will probably be the most useful one.
+// given that we are at the flop, and I am holding a specific hand, calculate my
+// equity. void multiway_equity_calc(my_hand, flop1, flop2)
+
+void multiway_equity_calc(vector<int> hand, vector<int> flop1,
+                          vector<int> flop2) {}
+
+void multiway_equity_calc() {
+  int num_players = 5;
+  int num_iterations = 100000;
+
+  // sum_eq[i] = cumulative equity of player i.
+  vector<double> sum_eq(num_players);
+
+  vector<vector<int>> hands(num_players);
+
+  Deck d;
+  for (int i = 0; i < num_players; i++) {
+    hands[i] = d.deal_without_replacement(4);
+  }
+
+  for (int i = 0; i < num_iterations; i++) {
+    // b = both boards. First 5 is first board, second 5 is second board.
+    vector<int> b = d.deal_with_replacement(10);
+
+    phevaluator::Rank board_one_best_rank = phevaluator::Rank(999999);
+    phevaluator::Rank board_two_best_rank = phevaluator::Rank(999999);
+    vector<int> board_one_winners;
+    vector<int> board_two_winners;
+
+    for (int j = 0; j < num_players; j++) {
+      phevaluator::Rank board1_j = phevaluator::EvaluatePlo4Cards(
+          b[0], b[1], b[2], b[3], b[4], hands[j][0], hands[j][1], hands[j][2],
+          hands[j][3]);
+      phevaluator::Rank board2_j = phevaluator::EvaluatePlo4Cards(
+          b[5], b[6], b[7], b[8], b[9], hands[j][0], hands[j][1], hands[j][2],
+          hands[j][3]);
+
+      if (board1_j > board_one_best_rank) {
+        board_one_winners.clear();
+        board_one_winners.push_back(j);
+        board_one_best_rank = board1_j;
+      } else if (board1_j == board_one_best_rank) {
+        board_one_winners.push_back(j);
+      }
+
+      if (board2_j > board_two_best_rank) {
+        board_two_winners.clear();
+        board_two_winners.push_back(j);
+        board_two_best_rank = board2_j;
+      } else if (board2_j == board_two_best_rank) {
+        board_two_winners.push_back(j);
+      }
+    }
+
+    for (const auto &winner : board_one_winners) {
+      sum_eq[winner] += 0.5 / (double)(board_one_winners.size());
+    }
+
+    for (const auto &winner : board_two_winners) {
+      sum_eq[winner] += 0.5 / (double)(board_two_winners.size());
+    }
+  }
+
+  cout << "Iterations: " << num_iterations << endl;
+  cout << "Players: " << num_players << endl;
+  for (int i = 0; i < num_players; i++) {
+    cout << "Player " << i << ": Hand = " << hand_to_string(hands[i])
+         << "| Equity = " << sum_eq[i] / (double)num_iterations << endl;
+  }
+}
+
 int equity_calc() {
   Deck d;
 
@@ -139,7 +211,7 @@ int equity_calc() {
       eq1 += 0.25;
       eq2 += 0.25;
       chop1++;
-    } else if (h1b1 > h2b1) {
+    } else if (h1b1 < h2b1) {
       eq2 += 0.5;
     } else {
       eq1 += 0.5;
@@ -150,7 +222,7 @@ int equity_calc() {
       eq1 += 0.25;
       eq2 += 0.25;
       chop2++;
-    } else if (h1b2 > h2b2) {
+    } else if (h1b2 < h2b2) {
       eq2 += 0.5;
     } else {
       eq1 += 0.5;
@@ -193,7 +265,7 @@ int main() {
   //          << phevaluator::Card(i).describeCard() << endl;
   //   }
 
-  equity_calc();
+  multiway_equity_calc();
 
   return 0;
 }
