@@ -10,7 +10,14 @@ int main() {
   // Example:
   // evaluate_hand();
 
-  phevaluator::Rank ev = phevaluator::EvaluatePlo4Cards(1, 2, 3, 4, 5, 6, 7, 8, 9);
-  std::cout << ev.value() << std::endl;
+  phevaluator::Rank r = phevaluator::EvaluatePlo4Cards(1, 2,3,8,9,4,5,6,7);
+
+
+  for(int i = 0; i<52; i++){
+    std::cout << phevaluator::Card(i).describeCard() << std::endl;
+  }
+  std::cout << r.value() << std::endl;
+
+  std::cout << r.describeRank() << std::endl;
   return 0;
 }

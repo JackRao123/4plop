@@ -11,10 +11,9 @@ set(SOURCES
     tables/hashtable.cpp
     tables/tables_bitwise.cpp
     tables/tables_plo4.cpp
+    tables/7462.cpp
 
-    kev/fast_eval.c
-    kev/kev_eval.c
-
+    src/rank.cpp
     src/card_sampler.cpp
     src/evaluator_plo4.cpp
     src/hash.cpp
