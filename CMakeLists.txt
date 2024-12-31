@@ -8,8 +8,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Add the phevaluator library
 add_subdirectory(phevaluator)
 
+set(SOURCES 
+
+main.cpp
+cfr.cpp
+
+
+)
+
+
 # Add the main executable
-add_executable(4plop main.cpp)
+add_executable(4plop ${SOURCES})
 
 
 
