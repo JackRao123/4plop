@@ -23,9 +23,7 @@ public:
       cards.push_back(i);
     }
 
-    unsigned long long seed =
-        chrono::system_clock::now().time_since_epoch().count();
-    shuffle(cards.begin(), cards.end(), default_random_engine(seed));
+    shuffle();
 
     random_device rd;
     gen = mt19937(rd());
@@ -45,6 +43,11 @@ public:
     return card;
   }
 
+  void shuffle() {
+    unsigned long long seed =
+        chrono::system_clock::now().time_since_epoch().count();
+    std::shuffle(cards.begin(), cards.end(), default_random_engine(seed));
+  }
   // deal_without_modification deals num_cards cards without modifying deck.
   // Param:
   // int num_cards : number of cards to deal
@@ -88,7 +91,6 @@ public:
   // erase removes specific cards from the deck. Throws error if they are not
   // found. Param: vector<int> cards_to_remove: vector of cards to remove.
   // cards_to_remove must be unique
-
   //(you wont ever have to remove cards that are the same anyways)
   void erase(vector<int> cards_to_remove) {
 
@@ -125,6 +127,11 @@ public:
       throw runtime_error("Failed to remove some cards. Probably duplicate "
                           "card error somewhere.");
     }
+  }
+
+  void replace(int card) {
+    cards.push_back(card);
+    shuffle();
   }
 };
 

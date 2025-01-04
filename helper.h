@@ -41,4 +41,27 @@ vector<int> string_to_hand(string s) {
   }
   return hand;
 }
+
+// Random double range [min, max]
+double rand_double(double min, double max) {
+  static thread_local std::mt19937 gen(
+      std::random_device{}()); // Thread-local random engine
+  std::uniform_real_distribution<double> dis(min, max); // Uniform distribution
+  return dis(gen);
+}
+
+// hashes hand to a unique number.
+// Hand should be length exactly 4.
+// todo: more efficient hashing system.
+int hand_hash(vector<int> hand) {
+
+  // sort ascending order.
+  sort(hand.begin(), hand.end());
+
+  int hash =
+      hand[0] + 52 * hand[1] + 52 * 52 * hand[2] + 52 * 52 * 52 * hand[3];
+
+  return hash;
+}
+
 #endif

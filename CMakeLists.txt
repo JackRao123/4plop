@@ -10,9 +10,13 @@ add_subdirectory(phevaluator)
 
 set(SOURCES 
 
-main.cpp
-cfr.cpp
+    main.cpp 
 
+    cfr.h
+    deck.h
+    helper.h
+    equity_calc.h
+    player.h
 
 )
 
