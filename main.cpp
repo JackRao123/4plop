@@ -40,7 +40,9 @@ int main() {
 
   Simulation s;
 
-  s.simulate(flop1, flop2, 6, 200.0, 5.0);
+  for (int i = 0; i < 1000; i++) {
+	  s.simulate(flop1, flop2, 6, 200.0, 5.0);
+  }
 
   //   vector<int> multiway_equity_calc();
 

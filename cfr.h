@@ -14,6 +14,7 @@
 #include <sstream>
 #include <unordered_set>
 #include <vector>
+#include <filesystem>
 
 #define MAX_UNIQUE_HANDS 52 * 52 * 52 * 52
 
@@ -104,11 +105,17 @@ private:
 	// Strategy file format:
 	// handhash action1 prob1 action2 prob2 ...
 	bool load() {
+		// Get the path to the current source file
+		string source_file_path = __FILE__;
+		filesystem::path source_dir = filesystem::path(source_file_path).parent_path();
 		string filename = get_filename();
-		string filepath = "./data/" + filename;
+		filesystem::path filepath = source_dir / "data" / filename;
+
 		ifstream infile(filepath);
 
+		//cout << "Loading from " << filepath << endl;
 		if (infile.is_open()) {
+			cout << "cache hit" << endl;
 			string line;
 			while (std::getline(infile, line)) {
 				istringstream lineStream(line);
@@ -134,7 +141,8 @@ private:
 			return true;
 		}
 		else {
-			cerr << "failed to open file for reading: " << filepath << endl;
+			cout << "cache miss" << endl;
+			//cerr << "failed to open file for reading: " << filepath << endl;
 			return false;
 		}
 		return false;
@@ -142,8 +150,14 @@ private:
 
 	// Saves the strategy to a file.
 	void save() {
+
+		string source_file_path = __FILE__;
+		filesystem::path source_dir = filesystem::path(source_file_path).parent_path();
 		string filename = get_filename();
-		string filepath = "./data/" + filename;
+		filesystem::path filepath = source_dir / "data" / filename;
+
+
+
 		ofstream outfile(filepath);
 
 		if (outfile.is_open()) {
@@ -156,9 +170,9 @@ private:
 				for (const auto& [action, probability] : strat) {
 					outfile << action << " " << probability << " ";
 				}
+				outfile << endl;
 			}
 
-			outfile << endl;
 		}
 		else {
 			cerr << "failed to open file for writing: " << filepath << endl;
@@ -193,6 +207,8 @@ public:
 		*this = other;
 
 		this->strategy = {};
+		load();
+
 		this->players = other.players;
 		this->deck.shuffle();
 	}
@@ -225,7 +241,6 @@ public:
 	// reopen_action should be called when aggression is made.
 	// on all unfolded players
 	void reopen_action(int aggressor) {
-
 		for (int i = 0; i < players.size(); i++) {
 			if (i == aggressor) {
 				continue;
@@ -340,7 +355,7 @@ public:
 			}
 
 			strategy[handhash] = strat;
-			print_strategy(hand, strat);
+			//print_strategy(hand, strat);
 		}
 		else {
 			// don't change strategy
@@ -349,6 +364,9 @@ public:
 			// 
 			//strategy[handhash] = get_default_strategy(player_idx);
 		}
+
+
+		save();
 
 	}
 
@@ -552,7 +570,7 @@ public:
 		unordered_map<HandAction, double> action_ev;
 		unordered_map<HandAction, int> action_count;
 
-		int num_simulations = 2;
+		int num_simulations = 1;
 		for (int i = 0; i < num_simulations; i++) {
 			Node next = Node(node); // copy constructor
 			HandAction action = next.do_next_action();
