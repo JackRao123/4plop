@@ -29,7 +29,7 @@ public:
 
   bool is_folded() { return folded; }
 
-  bool is_all_in() { return money == 0.0; }
+  bool is_all_in() { return money < 0.001; }
 
   double get_money() { return money; }
 
