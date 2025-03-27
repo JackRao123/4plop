@@ -15,17 +15,6 @@
 using namespace std;
 
 int main() {
-
-  //   phevaluator::Rank r =
-  //       phevaluator::EvaluatePlo4Cards(1, 2, 3, 4, 5, 6, 7, 8, 9);
-
-  //   std::cout << "Rank is " << r.value() << std::endl;
-
-  //   for (int i = 0; i < 52; i++) {
-  //     cout << "Card " << i << " corresponds to "
-  //          << phevaluator::Card(i).describeCard() << endl;
-  //   }
-
   Deck d;
 
   vector<int> flop1 = string_to_hand("JcQdKc");
@@ -36,15 +25,8 @@ int main() {
   d.erase(flop2);
   d.erase(hand);
 
-  // multiway_equity_calc(hand, flop1, flop2, d);
-
   Simulation s;
-
-  for (int i = 0; i < 1000; i++) {
-	  s.simulate(flop1, flop2, 6, 200.0, 5.0);
-  }
-
-  //   vector<int> multiway_equity_calc();
+  s.simulate(flop1, flop2, 6, 70.0, 5.0);
 
   return 0;
 }

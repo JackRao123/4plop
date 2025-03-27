@@ -13,7 +13,7 @@
 using namespace std;
 
 class Player {
-private:
+public:
   vector<int> hand;
   double money;
 
