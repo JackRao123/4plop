@@ -44,9 +44,8 @@ vector<int> string_to_hand(string s) {
 
 // Random double range [min, max]
 double rand_double(double min, double max) {
-  static thread_local std::mt19937 gen(
-      std::random_device{}()); // Thread-local random engine
-  std::uniform_real_distribution<double> dis(min, max); // Uniform distribution
+  static thread_local std::mt19937 gen(std::random_device{}()); // Thread-local random engine
+  std::uniform_real_distribution<double> dis(min, max);         // Uniform distribution
   return dis(gen);
 }
 
@@ -58,10 +57,20 @@ int hand_hash(vector<int> hand) {
   // sort ascending order.
   sort(hand.begin(), hand.end());
 
-  int hash =
-      hand[0] + 52 * hand[1] + 52 * 52 * hand[2] + 52 * 52 * 52 * hand[3];
+  int hash = hand[0] + 52 * hand[1] + 52 * 52 * hand[2] + 52 * 52 * 52 * hand[3];
 
   return hash;
+}
+
+string hand_hash_to_string(int hash) {
+  vector<int> hand;
+
+  for (int i = 3; i >= 0; i--) {
+    hand.push_back(hash / (int)(pow(52, i)));
+    hash = hash % (int)pow(52,i);
+  }
+
+  return hand_to_string(hand);
 }
 
 #endif

@@ -1,4 +1,5 @@
-#include "cfr.h"
+#include "simulation.h"
+#include "node.h"
 #include "deck.h"
 #include "equity_calc.h"
 #include "helper.h"
@@ -19,14 +20,14 @@ int main() {
 
   vector<int> flop1 = string_to_hand("JcQdKc");
   vector<int> flop2 = string_to_hand("8s2h5s");
-  vector<int> hand = string_to_hand("8d8cKhKs");
+  vector<int> hand = string_to_hand("ThAh3s4s");
 
   d.erase(flop1);
   d.erase(flop2);
   d.erase(hand);
 
   Simulation s;
-  s.simulate(flop1, flop2, 6, 70.0, 5.0);
+  s.simulate(flop1, flop2, 6, 50.0, 5.0);
 
   return 0;
 }

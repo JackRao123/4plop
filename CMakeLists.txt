@@ -12,7 +12,8 @@ add_subdirectory(phevaluator)
 # Add the main application sources
 set(SOURCES 
     main.cpp 
-    cfr.h
+    simulation.h
+    node.h
     deck.h
     helper.h
     equity_calc.h
