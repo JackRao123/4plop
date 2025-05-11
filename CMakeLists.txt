@@ -39,6 +39,11 @@ add_library(imgui STATIC
     imgui/imgui_tables.cpp
     imgui/backends/imgui_impl_glfw.cpp
     imgui/backends/imgui_impl_opengl3.cpp
+
+    # #for easier debugging in Visual studio
+    # idk how to add these 
+    # misc/debuggers/imgui.natvis
+    # misc/debuggers/imgui.natstepfilter
 )
 target_include_directories(imgui PUBLIC
     imgui
