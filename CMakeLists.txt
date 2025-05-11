@@ -18,6 +18,7 @@ set(SOURCES
     helper.h
     equity_calc.h
     player.h
+    # gui.h
 )
 
 # Add the main executable
@@ -25,6 +26,32 @@ add_executable(4plop ${SOURCES})
 
 # Link the phevaluator library to the executable
 target_link_libraries(4plop PRIVATE phevaluator)
+
+# --- GLFW+IMGUI --- 
+add_subdirectory(glfw)
+# add_subdirectory(imgui)
+
+# imgui repo doesn’t have its own CMake by default, so we’ll drop one in:
+add_library(imgui STATIC
+    imgui/imgui.cpp
+    imgui/imgui_draw.cpp
+    imgui/imgui_widgets.cpp
+    imgui/imgui_tables.cpp
+    imgui/backends/imgui_impl_glfw.cpp
+    imgui/backends/imgui_impl_opengl3.cpp
+)
+target_include_directories(imgui PUBLIC
+    imgui
+    imgui/backends
+)
+target_link_libraries(imgui PUBLIC
+    glfw
+    opengl32 # i need this? windows OS provides this apparently?
+)
+target_link_libraries(4plop PRIVATE imgui)
+
+
+
 
 # --- Google Test Integration --- 
 # For Windows: Prevent overriding the parent project's compiler/linker settings
@@ -34,7 +61,6 @@ set(BUILD_GMOCK OFF CACHE BOOL "Disable building Google Mock")
 # Add GoogleTest as a subdirectory
 add_subdirectory(googletest)
  
-
 # Add the tests directory
 add_subdirectory(tests)
 
