@@ -19,6 +19,7 @@ set(SOURCES
     equity_calc.h
     player.h
     gui.h
+    gamestate.h
 )
 
 # Add the main executable

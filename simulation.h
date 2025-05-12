@@ -43,8 +43,6 @@ public:
 	// ante - bomb pot ante, in $.
 	Simulation() {}
 
-	// CFR is a recursive DFS
-
 	// DFS for CFR:
 	// Params:
 	// Node: current node
@@ -52,22 +50,22 @@ public:
 	// Returns:
 	// Vector of EVs for each player.
 	vector<double> recurse(Node* node) {
-		if (node->end_of_game()) {
+		if (node->state_.end_of_game()) {
 			// If it is terminal, it is not a decision node.
 			// So therefore just return EVs here.
 
-			return node->calculate_ev();
+			return node->state_.calculate_ev();
 		}
 
-		if (node->end_of_action()) {
-			node->next_street();
+		if (node->state_.end_of_action()) {
+			node->state_.next_street();
 			return recurse(node);
 		}
 
 		// This returns the EVs for all players but we only calculate the regret for
 		// hero here. The rest we just pass back.
-		vector<double> overall_ev(num_players_);
-		int hero = node->get_next_to_act();
+		vector<double> average_ev(num_players_);
+		int hero = node->state_.get_next_to_act();
 
 		// Calculate regret for hero.
 		unordered_map<HandAction, double> action_ev;
@@ -75,28 +73,21 @@ public:
 
 		int num_simulations = 1;
 		for (int i = 0; i < num_simulations; i++) {
-			Node* next = new Node(node);
-			HandAction action = next->do_next_action();
+			HandAction next_action = node->GetNextAction();
+			Node* next = node->GetChild(next_action);
 
-			if (node->children.find(action) != node->children.end()) {
-				next = node->children[action];
-			}
-			else {
-				node->children[action] = next;
-			}
-
-			vector<double> ev = recurse(next);
+			vector<double> sample_ev = recurse(next);
 			for (int j = 0; j < num_players_; j++) {
-				overall_ev[j] += ev[j];
+				average_ev[j] += sample_ev[j];
 			}
 
-			action_ev[action] += ev[hero];
-			action_count[action]++;
+			action_ev[next_action] += sample_ev[hero];
+			action_count[next_action]++;
 		}
 
 		// Convert to average
 		for (int i = 0; i < num_players_; i++) {
-			overall_ev[i] /= (double)num_simulations;
+			average_ev[i] /= (double)num_simulations;
 		}
 
 		// Convert to average
@@ -107,7 +98,7 @@ public:
 		// This is the strategy for 'next_to_act', at the current NODE.
 		node->adjust_strategy(action_ev, hero);
 
-		return overall_ev;
+		return average_ev;
 	}
 
 	// Entry point
@@ -191,7 +182,7 @@ public:
 			//cout << "Done " << iterations << " iterations " << endl;
 
 			lock.unlock();
-			focus_->redeal();
+			focus_->state_.redeal();
 			recurse(focus_);
 		}
 	}

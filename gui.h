@@ -109,27 +109,15 @@ public:
 	}
 
 	// UI code
-
 	void Solve(const string& flop1, const string& flop2) {
 		int num_players = 6;
 		double stack_depth = 50.0;
 		double ante = 5.0;
 
-		// vector<int> flop1vec = string_to_hand(flop1);
-		// vector<int> flop2vec = string_to_hand(flop2);
-
 		simulation_.initialise(flop1, flop2, num_players, stack_depth, ante);
-		//cout << "done initialising" << endl;
 		simulation_.StartSolver();
 	}
 
-	// close a node, and recursively, all its children.
-	void CloseNode(int node_id) {
-		gui_node_is_open_[node_id] = false;
-		for (const auto& [child_id, _] : gui_node_children_[node_id]) {
-			CloseNode(child_id);
-		}
-	}
 
 	// For a node, Open parents, close children
 	void FocusNode(int node_id) {
@@ -142,13 +130,6 @@ public:
 			cur = gui_node_parent_[cur];
 			gui_node_is_open_[cur] = true;
 		}
-
-		/*	for (const auto& [child_id, _] : gui_node_children_[node_id]) {
-				CloseNode(child_id);
-			}*/
-
-
-
 
 		simulation_.SetFocus(gui_node_to_solver_node_[node_id]);
 	}
@@ -290,6 +271,10 @@ public:
 
 					ImGui::TableSetColumnIndex(3);
 					ImGui::Text("Fold: %f", strategymap[HandAction::FOLD]);
+
+
+					ImGui::TableSetColumnIndex(4);
+					ImGui::Text("Visits: %d", focus->num_strategy_computes_[hand_hash]);
 
 					strategy_rows_displayed++;
 					if (strategy_rows_displayed >= strategy_max_rows) {
