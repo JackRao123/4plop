@@ -32,7 +32,7 @@ vector<int> string_to_hand(string s) {
 
   vector<int> hand;
   if (s.size() % 2 != 0) {
-    throw runtime_error("String length be divisible by 2.");
+    throw runtime_error("Hand string length be divisible by 2.");
   }
 
   for (int i = 0; i < s.size(); i = i + 2) {
@@ -67,7 +67,7 @@ string hand_hash_to_string(int hash) {
 
   for (int i = 3; i >= 0; i--) {
     hand.push_back(hash / (int)(pow(52, i)));
-    hash = hash % (int)pow(52,i);
+    hash = hash % (int)pow(52, i);
   }
 
   return hand_to_string(hand);

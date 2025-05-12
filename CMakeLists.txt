@@ -18,7 +18,7 @@ set(SOURCES
     helper.h
     equity_calc.h
     player.h
-    # gui.h
+    gui.h
 )
 
 # Add the main executable
