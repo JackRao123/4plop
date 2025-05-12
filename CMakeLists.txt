@@ -14,12 +14,15 @@ set(SOURCES
     main.cpp 
     simulation.h
     node.h
+    chancenode.h
     deck.h
     helper.h
     equity_calc.h
     player.h
     gui.h
     gamestate.h
+    node.cpp
+    chancenode.cpp
 )
 
 # Add the main executable

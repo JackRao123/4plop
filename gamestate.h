@@ -1,7 +1,9 @@
 #ifndef GAMESTATE_H
 #define GAMESTATE_H
 #include "include/phevaluator.h"
+#include "equity_calc.h"
 #include "player.h"
+#include "deck.h"
 #include "node.h"
 #include <algorithm>
 #include <chrono>
@@ -154,9 +156,13 @@ public:
 
 	// Deals out one card to each board.
 	// Sets first to act to SB.
-	void next_street() {
-		board1.push_back(deck.deal());
-		board2.push_back(deck.deal());
+	//returns {card dealt to board1, card dealt to board2}
+	pair<int, int> next_street() {
+		int c1 = deck.deal();
+		int c2 = deck.deal();
+
+		board1.push_back(c1);
+		board2.push_back(c2);
 
 		for (int i = 0; i < players.size(); i++) {
 			pot += bets_placed[i];
@@ -169,6 +175,8 @@ public:
 
 		next_to_act = 0;
 		previous_aggressor = -1;
+
+		return { c1,c2 };
 	}
 
 	int get_next_to_act() const { return next_to_act; }

@@ -1,5 +1,4 @@
-#ifndef EQUITY_CALC_H
-#define EQUITY_CALC_H
+#pragma once
 #include "deck.h"
 #include "helper.h"
 #include "include/phevaluator.h"
@@ -15,7 +14,7 @@
 using namespace std;
 
 // Helper function - calculates equity at showdown.
-vector<double> equity_calc(vector<vector<int>> &hands, vector<int> &board1,
+inline vector<double> equity_calc(vector<vector<int>> &hands, vector<int> &board1,
                            vector<int> &board2) {
   int num_players = hands.size();
   vector<double> equity(num_players);
@@ -64,7 +63,7 @@ vector<double> equity_calc(vector<vector<int>> &hands, vector<int> &board1,
 // this will probably be the most useful one.
 // given that we are at the flop, and I am holding a specific hand, calculate my
 // equity. void multiway_equity_calc(my_hand, flop1, flop2)
-void multiway_equity_calc(vector<int> hand, vector<int> flop1,
+inline void multiway_equity_calc(vector<int> hand, vector<int> flop1,
                           vector<int> flop2, Deck d) {
   int num_players = 8;
   int num_iterations = 100000;
@@ -113,7 +112,7 @@ void multiway_equity_calc(vector<int> hand, vector<int> flop1,
   cout << "Equity: " << sum_eq / (double)num_iterations << endl;
 }
 
-void multiway_equity_calc() {
+inline void multiway_equity_calc() {
   int num_players = 5;
   int num_iterations = 100000;
 
@@ -148,7 +147,7 @@ void multiway_equity_calc() {
   }
 }
 
-int equity_calc() {
+inline int equity_calc() {
   Deck d;
 
   vector<int> h1 = d.deal_with_modification(4);
@@ -228,5 +227,3 @@ int equity_calc() {
 
   return 0;
 }
-
-#endif

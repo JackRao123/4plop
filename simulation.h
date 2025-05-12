@@ -3,6 +3,7 @@
 #include "equity_calc.h"
 #include "include/phevaluator.h"
 #include "node.h"
+#include "chancenode.h"
 #include "player.h"
 #include <algorithm>
 #include <chrono>
@@ -57,9 +58,10 @@ public:
 			return node->state_.calculate_ev();
 		}
 
-		if (node->state_.end_of_action()) {
-			node->state_.next_street();
-			return recurse(node);
+		if (auto chance_node = dynamic_cast<ChanceNode*>(node)) {
+			// next_node is a decision node - after dealing cards.
+			Node* next_node = chance_node->GetChild();
+			return recurse(next_node);
 		}
 
 		// This returns the EVs for all players but we only calculate the regret for
@@ -188,6 +190,7 @@ public:
 	}
 
 	void StartSolver() {
+		cout << "Starting solver " << endl;
 		ResumeSolver();
 		worker_thread_ = thread(&Simulation::SolverLoop, this);
 	}
@@ -203,6 +206,7 @@ public:
 	}
 
 	void StopSolver() {
+		cout << "stopping solver " << endl;
 		{
 			lock_guard<mutex> lock(mtx);
 			state_ = SimulationState::STOPPED;
