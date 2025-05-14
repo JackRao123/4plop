@@ -1,7 +1,7 @@
 Work in progress.
 
 
-To build - 
+To build and run- 
 
 start in /4plop directory
 
@@ -9,8 +9,7 @@ Then run these commands
 ```mkdir build
 cd build
 cmake ..
-cmake --build .
-cd Debug
-the .exe is there 
+cmake --build . --config Release
+.\Release\4plop.exe
 ```
 
