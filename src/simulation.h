@@ -12,10 +12,10 @@
 #include "chancenode.h"
 #include "node.h"
 
-enum SimulationState { RUNNING, PAUSED, STOPPED };
-
 class Simulation {
  private:
+  enum State { RUNNING, PAUSED, STOPPED };
+
   int num_players_;
 
   Node* root_ = nullptr;   // root of the game tree (shouldn't change)
@@ -24,7 +24,7 @@ class Simulation {
 
   mutex mtx;
 
-  SimulationState state_ = SimulationState::STOPPED;
+  State state_ = State::STOPPED;
   thread worker_thread_;
 
  public:
@@ -167,10 +167,10 @@ class Simulation {
     unique_lock<mutex> lock(mtx, defer_lock);
     while (true) {
       lock.lock();
-      if (state_ == SimulationState::STOPPED) {
+      if (state_ == State::STOPPED) {
         lock.unlock();
         break;
-      } else if (state_ == SimulationState::PAUSED) {
+      } else if (state_ == State::PAUSED) {
         lock.unlock();
         this_thread::sleep_for(chrono::milliseconds(100));
         continue;
@@ -198,19 +198,19 @@ class Simulation {
 
   void ResumeSolver() {
     lock_guard<mutex> lock(mtx);
-    state_ = SimulationState::RUNNING;
+    state_ = State::RUNNING;
   }
 
   void PauseSolver() {
     lock_guard<mutex> lock(mtx);
-    state_ = SimulationState::PAUSED;
+    state_ = State::PAUSED;
   }
 
   void StopSolver() {
     cout << "stopping solver " << endl;
     {
       lock_guard<mutex> lock(mtx);
-      state_ = SimulationState::STOPPED;
+      state_ = State::STOPPED;
     }
     worker_thread_.join();
   }
