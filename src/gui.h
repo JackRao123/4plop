@@ -147,7 +147,7 @@ public:
 			// draw children recursively if they exist
 			if (!gui_node_children_[node_id].empty()) {
 				for (const auto& [child_id, action] : gui_node_children_[node_id]) {
-					string label = gui_node_to_solver_node_[child_id]->GetTablePosition() + ": " + to_string(action);
+					string label = gui_node_to_solver_node_[node_id]->GetTablePosition() + ": " + to_string(action);
 
 					DrawNode(child_id, label);
 				}
@@ -162,7 +162,7 @@ public:
 					gui_node_parent_[new_node_id] = node_id;
 					gui_node_children_[node_id].push_back({ new_node_id, action });
 
-					string label = child_node->GetTablePosition() + ": " + to_string(action);
+					string label = gui_node_to_solver_node_[node_id]->GetTablePosition() + ": " + to_string(action);
 					DrawNode(new_node_id, label);
 				}
 			}
@@ -287,7 +287,7 @@ public:
 					unordered_map<HandAction, double> strategymap(strat.begin(), strat.end());
 
 					ImGui::TableSetColumnIndex(1);
-					ImGui::Text("Check/Call: %f", strategymap[HandAction::CHECK]);
+					ImGui::Text("Check/Call: %f", strategymap[HandAction::CHECK] +  strategymap[HandAction::CALL]);
 
 					ImGui::TableSetColumnIndex(2);
 					ImGui::Text("Pot: %f", strategymap[HandAction::POT]);

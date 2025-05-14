@@ -11,18 +11,18 @@ add_subdirectory(phevaluator)
 
 # Add the main application sources
 set(SOURCES 
-    main.cpp 
-    simulation.h
-    node.h
-    chancenode.h
-    deck.h
-    helper.h
-    equity_calc.h
-    player.h
-    gui.h
-    gamestate.h
-    node.cpp
-    chancenode.cpp
+    src/main.cpp 
+    src/simulation.h
+    src/node.h
+    src/chancenode.h
+    src/deck.h
+    src/helper.h
+    src/equity_calc.h
+    src/player.h
+    src/gui.h
+    src/gamestate.h
+    src/node.cpp
+    src/chancenode.cpp
 )
 
 # Add the main executable
