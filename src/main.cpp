@@ -2,11 +2,10 @@
 
 using namespace std;
 int main() {
+  View view;
+  view.Start();
 
-	View view;
-	view.Start();
-
-	return 0;
+  return 0;
 }
 
 // int main() {

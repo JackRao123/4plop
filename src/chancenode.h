@@ -1,37 +1,37 @@
-// chancenode.h 
-#pragma once 
-#include <unordered_map>   
-#include <utility>         
-#include "node.h"          
-#include "gamestate.h"     
+// chancenode.h
+#pragma once
+#include <unordered_map>
+#include <utility>
+
+#include "gamestate.h"
+#include "node.h"
 
 using namespace std;
 struct PairHash {
-	size_t operator()(const std::pair<int, int>& p) const noexcept {
-		// very simple hash function
-		return (static_cast<size_t>(p.first) << 32)
-			^ static_cast<size_t>(p.second);
-	}
+  size_t operator()(const std::pair<int, int>& p) const noexcept {
+    // very simple hash function
+    return (static_cast<size_t>(p.first) << 32) ^ static_cast<size_t>(p.second);
+  }
 };
 struct PairEq {
-	bool operator()(const std::pair<int, int>& a,
-		const std::pair<int, int>& b) const noexcept {
-		return a.first == b.first && a.second == b.second;
-	}
+  bool operator()(const std::pair<int, int>& a,
+                  const std::pair<int, int>& b) const noexcept {
+    return a.first == b.first && a.second == b.second;
+  }
 };
 
-
-//ChanceNode allows us to handle turns and rivers
+// ChanceNode allows us to handle turns and rivers
 class ChanceNode : public Node {
-private:
-	unordered_map<pair<int, int>, Node*, PairHash, PairEq> next_;
+ private:
+  unordered_map<pair<int, int>, Node*, PairHash, PairEq> next_;
 
-	GameState state_;
-public:
-	ChanceNode(GameState state) :state_(state) {}
+  GameState state_;
 
-	// GetChild deals out the next street, and then returns a decision node.
-	Node* GetChild();
+ public:
+  ChanceNode(GameState state) : state_(state) {}
 
-	Node* GetNextNode(int next_top_card, int next_bottom_card);
+  // GetChild deals out the next street, and then returns a decision node.
+  Node* GetChild();
+
+  Node* GetNextNode(int next_top_card, int next_bottom_card);
 };
