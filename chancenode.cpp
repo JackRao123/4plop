@@ -26,16 +26,17 @@ Node* ChanceNode::GetChild() {
 
 	Node* child;
 	if (next_.find(dealt_cards) != next_.end()) {
-		// if the child already exists, its state should be the correct value
 		child = next_[dealt_cards];
 	}
 	else {
 		child = new Node();
-		child->state_ = next_state;
 		child->parent = this;
 		next_[dealt_cards] = child;
 	}
 
+	// have to update the state no matter what - 
+	// even though action sequences are the same, we must change what cards the players have between runs.
+	child->state_ = next_state;
 	return child;
 }
 

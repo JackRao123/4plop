@@ -44,24 +44,25 @@ public:
 	// ante - bomb pot ante, in $.
 	Simulation() {}
 
-	// DFS for CFR:
+
+	// Recursive DFS for CFR:
 	// Params:
-	// Node: current node
-	// Deck: deck of cards
+	// Node: node to recurse from.
+	// reach_probability: probability of reaching node.
 	// Returns:
 	// Vector of EVs for each player.
-	vector<double> recurse(Node* node) {
+	vector<double> recurse(Node* node, double reach_probability) {
+
 		if (node->state_.end_of_game()) {
 			// If it is terminal, it is not a decision node.
 			// So therefore just return EVs here.
-
 			return node->state_.calculate_ev();
 		}
 
 		if (auto chance_node = dynamic_cast<ChanceNode*>(node)) {
 			// next_node is a decision node - after dealing cards.
 			Node* next_node = chance_node->GetChild();
-			return recurse(next_node);
+			return recurse(next_node, reach_probability);
 		}
 
 		// This returns the EVs for all players but we only calculate the regret for
@@ -75,10 +76,11 @@ public:
 
 		int num_simulations = 1;
 		for (int i = 0; i < num_simulations; i++) {
-			HandAction next_action = node->GetNextAction();
+			auto [next_action, action_probability] = node->GetNextAction();
 			Node* next = node->GetChild(next_action);
 
-			vector<double> sample_ev = recurse(next);
+			vector<double> sample_ev = recurse(next, reach_probability * action_probability);
+
 			for (int j = 0; j < num_players_; j++) {
 				average_ev[j] += sample_ev[j];
 			}
@@ -98,7 +100,7 @@ public:
 		}
 
 		// This is the strategy for 'next_to_act', at the current NODE.
-		node->adjust_strategy(action_ev, hero);
+		node->AdjustStrategy(action_ev, hero, reach_probability);
 
 		return average_ev;
 	}
@@ -132,7 +134,7 @@ public:
 		focus_ = root_;
 
 		// for (int i = 0; i < 10000; i++) {
-		//   focus_->redeal(); // re-deals everyone cards.
+		//   focus_->reset(); // re-deals everyone cards.
 		//   recurse(head);
 		//   cout << i << endl;
 		// }
@@ -184,8 +186,12 @@ public:
 			//cout << "Done " << iterations << " iterations " << endl;
 
 			lock.unlock();
-			focus_->state_.redeal();
-			recurse(focus_);
+			// recurse only from the root.
+			// add functionality later for switching recursion basepoint.
+			root_->state_.reset();
+			recurse(root_, 1.0);
+			//focus_->state_.reset();
+			//recurse(focus_, 1.0);
 		}
 	}
 

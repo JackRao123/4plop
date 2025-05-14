@@ -5,6 +5,7 @@
 #include "backends/imgui_impl_opengl3.h"
 #include "imgui.h"
 #include <utility>
+#include <mutex>
 
 #include "simulation.h"
 #include <GLFW/glfw3.h>
@@ -143,11 +144,10 @@ public:
 		}
 
 		if (gui_node_is_open_[node_id] && is_open) {
-
 			// draw children recursively if they exist
 			if (!gui_node_children_[node_id].empty()) {
 				for (const auto& [child_id, action] : gui_node_children_[node_id]) {
-					string label = gui_node_to_solver_node_[node_id]->GetTablePosition() + ": " + to_string(action);
+					string label = gui_node_to_solver_node_[child_id]->GetTablePosition() + ": " + to_string(action);
 
 					DrawNode(child_id, label);
 				}
@@ -162,7 +162,7 @@ public:
 					gui_node_parent_[new_node_id] = node_id;
 					gui_node_children_[node_id].push_back({ new_node_id, action });
 
-					string label = solver_node->GetTablePosition() + ": " + to_string(action);
+					string label = child_node->GetTablePosition() + ": " + to_string(action);
 					DrawNode(new_node_id, label);
 				}
 			}
@@ -242,8 +242,6 @@ public:
 			// Draw strategy tree (choices of actions)
 			DrawNode(root_node_id, "Start");
 
-
-
 			// Draw strategy table (strategy for each hand)
 			// look through the strategy of focused node, and populate.
 			int strategy_max_rows = 50;
@@ -251,11 +249,23 @@ public:
 			ImGui::Separator();
 
 			Node* focus = simulation_.GetFocus();
-			ImGui::Text("Current node: %s, hands: %d", focus->GetTablePosition().c_str(), focus->strategy.size());
-			if (ImGui::BeginTable("table1", 5)) {
+			
+
+			// !!!
+			// reference, or directly iterating through focus->strategy is much faster
+			// copying, or using a mutex, is quite slow.
+			// fastest way is probably to use a mutex and iterate through the map (because we are only displaying like 50 at a time).
+			unordered_map<int, vector<pair<HandAction, double>>> & node_strategy = focus->strategy;
+			//{
+			//	lock_guard<mutex> lock(focus->mtx);
+			//	node_strategy = focus->strategy;
+			//}
+
+			ImGui::Text("Current node: %s, hands: %d", focus->GetTablePosition().c_str(), node_strategy.size());
+			if (ImGui::BeginTable("table1", 6)) {
 				// Display the strategy for this node.
 
-				for (const auto& [hand_hash, strat] : focus->strategy) {
+				for (const auto& [hand_hash, strat] : node_strategy) {
 					ImGui::TableNextRow();
 
 					ImGui::TableSetColumnIndex(0);
@@ -272,9 +282,11 @@ public:
 					ImGui::TableSetColumnIndex(3);
 					ImGui::Text("Fold: %f", strategymap[HandAction::FOLD]);
 
-
 					ImGui::TableSetColumnIndex(4);
-					ImGui::Text("Visits: %d", focus->num_strategy_computes_[hand_hash]);
+					ImGui::Text("Nothing: %f", strategymap[HandAction::NOTHING]);
+
+					ImGui::TableSetColumnIndex(5);
+					ImGui::Text("Visits: %f", focus->visit_count_[hand_hash]);
 
 					strategy_rows_displayed++;
 					if (strategy_rows_displayed >= strategy_max_rows) {
@@ -290,7 +302,6 @@ public:
 		// FPS counter
 		float fps = ImGui::GetIO().Framerate;
 		ImGui::Text("FPS: %.1f", fps);
-
 
 		ImGui::End();
 	}

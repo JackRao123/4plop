@@ -79,12 +79,11 @@ using namespace std;
 // Adjust the strategy.
 // action_ev is the ev of various actions, performed by player_idx at this
 // node.
-void Node::adjust_strategy(unordered_map<HandAction, double>& action_ev, int player_idx) {
-	vector<int> hand = state_.players[player_idx].get_hand();
-
+void Node::AdjustStrategy(unordered_map<HandAction, double>& action_ev, int player_idx, double reach_probability) {
+	vector<int> hand = state_.players_[player_idx].get_hand();
 	int handhash = hand_hash(hand);
 
-	vector<pair<HandAction, double>> strat = get_strategy(player_idx);
+	vector<pair<HandAction, double>> strat = GetStrategy(player_idx);
 
 	// weighted ev of this strategy.
 	double strategy_ev = 0.0;
@@ -92,48 +91,44 @@ void Node::adjust_strategy(unordered_map<HandAction, double>& action_ev, int pla
 		strategy_ev += probability * action_ev[action];
 	}
 
-	double total_positive_regret = 0.0;
-	unordered_map<HandAction, double> positive_regrets;
 	// Update regrets for each action
 	for (auto& [action, probability] : strat) {
 		double regret = action_ev[action] - strategy_ev; // CFR Regret formula
+		cumulative_regret_[handhash][action] += regret;
+	}
 
-		if (regret > 0) {
-			total_positive_regret += regret;
-			positive_regrets[action] += regret;
+	for (auto& [action, probability] : strat) {
+		cumulative_strategy_[handhash][action] += probability * reach_probability;
+	}
+
+	double sum_pos_regret = 0.0;
+	for (auto& pr : cumulative_regret_[handhash]) {
+		if (pr.second > 0) {
+			sum_pos_regret += pr.second;
 		}
 	}
 
-	if (total_positive_regret > 0) {
-		// Update strat
-		vector<pair<HandAction, double>> strat = get_strategy(player_idx);
-
-		for (int i = 0; i < strat.size(); i++) {
-			HandAction action = strat[i].first;
-
-			// if regret for action = 0, then probability will be 0
-			strat[i] = { action, positive_regrets[action] / total_positive_regret };
+	if (sum_pos_regret > 0) {
+		strat.clear();
+		for (const auto& [action, r] : cumulative_regret_[handhash]) {
+			double p = r > 0 ? r / sum_pos_regret : 0;
+			strat.push_back({ action,p });
 		}
-
 		strategy[handhash] = strat;
-		num_strategy_computes_[handhash]++;
-		// print_strategy(hand, strat);
 	}
-	else {
-		// don't change strategy
-		// should we fallback to default, or maintain previous?
-		//strategy[handhash] = get_default_strategy(player_idx);
-		num_strategy_computes_[handhash]++;
-		//cout << "Default strat" << endl;
+	else { // fall back to default
+		strategy[handhash] = GetUniformStrategy(player_idx);
 	}
+
+	visit_count_[handhash] += reach_probability;
 }
 
 
 
 // Default strategy for allowable actions at a decision point.
 // Returns a strategy where each allowed action has equal probability
-vector<pair<HandAction, double>> Node::get_default_strategy(int player_idx) {
-	Player player = state_.players[player_idx];
+vector<pair<HandAction, double>> Node::GetUniformStrategy(int player_idx) {
+	Player player = state_.players_[player_idx];
 
 	if (player.is_folded() || player.is_all_in()) {
 		return { {NOTHING, 1.0} };
@@ -147,7 +142,7 @@ vector<pair<HandAction, double>> Node::get_default_strategy(int player_idx) {
 		available.push_back(POT);
 	}
 
-	if (state_.previous_aggressor == -1) {
+	if (state_.previous_aggressor_ == -1) {
 		available.push_back(CHECK);
 	}
 	else {
@@ -156,7 +151,6 @@ vector<pair<HandAction, double>> Node::get_default_strategy(int player_idx) {
 	}
 
 	vector<pair<HandAction, double>> strat;
-
 	for (const auto& action : available) {
 		strat.push_back({ action, 1.0 / (double)available.size() });
 	}
@@ -165,28 +159,24 @@ vector<pair<HandAction, double>> Node::get_default_strategy(int player_idx) {
 }
 
 
-vector<pair<HandAction, double>> Node::get_strategy(int player_idx) {
-	int handhash = hand_hash(state_.players[player_idx].get_hand());
-
-	// Return found strategy
-	if (strategy.find(handhash) != strategy.end()) {
-		return strategy[handhash];
+// GetStrategy finds the strategy for a particular player at this node, or sets it to the uniform strategy if it doesn't exist.
+vector<pair<HandAction, double>> Node::GetStrategy(int player_idx) {
+	// !!!
+	//lock_guard<mutex> lock(mtx);
+	int handhash = hand_hash(state_.players_[player_idx].get_hand());
+	if (strategy.find(handhash) == strategy.end()) {
+		strategy[handhash] = GetUniformStrategy(player_idx);
 	}
 
-	// Not found - fallback to default.
-	vector<pair<HandAction, double>> strat = get_default_strategy(player_idx);
-
-	strategy[handhash] = strat;
-	return strat;
+	return strategy[handhash];
 }
-
-
 
 // Randomises next action based on strategy probabilities.
 // Doesn't perform the action.
-HandAction Node::GetNextAction() {
+// Returns {action to be performed, probability of choosing this action}.
+pair<HandAction, double> Node::GetNextAction() {
 	int next_to_act = state_.get_next_to_act();
-	vector<pair<HandAction, double>> strat = get_strategy(next_to_act);
+	vector<pair<HandAction, double>> strat = GetStrategy(next_to_act);
 
 	double chosen = rand_double(0.0, 1.0);
 	double cumulative = 0.0;
@@ -194,11 +184,11 @@ HandAction Node::GetNextAction() {
 		cumulative += probability;
 
 		if (chosen <= cumulative) {
-			return action;
+			return { action, probability };
 		}
 	}
 
-	return strat.back().first;
+	return strat.back();
 }
 
 // Creates and returns a child node, which has an action applied on it.
@@ -208,8 +198,6 @@ Node* Node::GetChild(HandAction action) {
 
 	Node* child;
 	if (children.find(action) != children.end()) {
-		// no need to update state.
-		// if the sequence of actions is the same, the state will be the same.
 		child = children[action];
 	}
 	else {
@@ -219,31 +207,21 @@ Node* Node::GetChild(HandAction action) {
 		else {
 			child = new Node();
 		}
-		child->state_ = next_state;
 		child->parent = this;
 		children[action] = child;
 	}
 
+	// have to update the state no matter what - 
+	// even though action sequences are the same, we must change what cards the players have between runs.
+	child->state_ = next_state;
 	return child;
 }
-
 
 // Returns position on table like UTG, BTN
 // only works for 6-handed right now
 string Node::GetTablePosition() const {
-	static constexpr std::array<const char*, 6> positions = {
-		"SB",    // 0  
-		"BB",    // 1  
-		"UTG",   // 2
-		"HJ",    // 3  
-		"CO",    // 4  
-		"BTN",   // 5 
-
-	};
-
-	assert(state_.get_next_to_act() >= 0 && state_.get_next_to_act() < 6 && "next_to_act out of range");
-	return positions[state_.get_next_to_act()];
+	static constexpr std::array<const char*, 6> positions = { "SB","BB","UTG","HJ","CO","BTN" };
+	int nta = state_.get_next_to_act();
+	assert(nta >= 0 && nta < state_.num_players_ && "next_to_act out of range");
+	return positions[nta];
 }
-
-
-
