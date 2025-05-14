@@ -1,7 +1,4 @@
-"yeah bro call, call, yes, call *nods*"
-
-"i have 2 full houses"
-
+Work in progress.
 
 
 To build - 
@@ -17,4 +14,3 @@ cd Debug
 the .exe is there 
 ```
 
-Edit the flops and hand at the bottom of main.cpp
