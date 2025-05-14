@@ -3,6 +3,7 @@
 
 #include <mutex>
 #include <string>
+#include <thread>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -24,10 +25,7 @@ class Node {
   // represents the probability at which we do that action.
   unordered_map<int, vector<pair<HandAction, double>>> strategy;
 
-  //// Number of times each handhash has had its strategy computed.
-  // unordered_map<int, int> num_strategy_computes_;
-
-  // mutex for the strategy
+  // concurrency
   mutex mtx;
 
   // Cumulative positive regret for each info set (handhash -> action -> regret)
@@ -45,33 +43,34 @@ class Node {
   Node* parent = nullptr;
 
   // Game state. Should be copied (and then modified) when spawning children.
-  GameState state_;
+  // GameState state_;
 
-  Node() {}
-  Node(const vector<int>& board1, const vector<int>& board2, int num_players,
-       double stack_depth, double ante) {
-    state_ = GameState(board1, board2, num_players, stack_depth, ante);
-  }
+  int table_position_;
+
+ Node(int table_position): table_position_(table_position) {}
+  // Node(const vector<int>& board1, const vector<int>& board2, int num_players,
+  //      double stack_depth, double ante) {
+  //   state_ = GameState(board1, board2, num_players, stack_depth, ante);
+  // }
 
   virtual ~Node() = default;
 
-  void AdjustStrategy(unordered_map<HandAction, double>& action_ev,
-                      int player_idx, double reach_probability);
+  void AdjustStrategy(GameState* game_state,
+                      unordered_map<HandAction, double>& action_ev,
+                      int handhash, double reach_probability);
 
-  // Default strategy for allowable actions at a decision point.
-  // Returns a strategy where each allowed action has equal probability
-  vector<pair<HandAction, double>> GetUniformStrategy(int player_idx);
-
-  // Gets the strategy for a particular player at this node
-  vector<pair<HandAction, double>> GetStrategy(int player_idx);
+  // Gets the strategy for a particular hand at this node
+  vector<pair<HandAction, double>> GetStrategy(GameState* game_state,
+                                               int handhash);
 
   // Randomises next action based on strategy probabilities.
   // Doesn't perform the action.
   // Returns {action to be performed, probability of choosing this action}.
-  pair<HandAction, double> GetNextAction();
+  pair<HandAction, double> GetNextAction(GameState* game_state, int handhash);
 
-  // Creates and returns a child node, which has an action applied on it.
-  Node* GetChild(HandAction action);
+  // GetNextNodeAndState advances both the game state, and the current node, by
+  // performing an action.
+  Node* GetNextNodeAndState(GameState* game_state, HandAction action);
 
   // Returns position on table like UTG, BTN
   // only works for 6-handed right now

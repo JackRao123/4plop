@@ -21,6 +21,8 @@ class Simulation {
   Node* root_ = nullptr;   // root of the game tree (shouldn't change)
   Node* focus_ = nullptr;  // node from which we are running computations and
                            // are viewing strategy for
+  GameState* game_state_;  // gamestate. reset at each iteration, and passed
+                           // through the game tree when recursing
 
   mutex mtx;
 
@@ -43,42 +45,45 @@ class Simulation {
   // reach_probability: probability of reaching node.
   // Returns:
   // Vector of EVs for each player.
-  vector<double> recurse(Node* node, double reach_probability) {
-    if (node->state_.end_of_game()) {
+  vector<double> recurse(Node* node, GameState* game_state,
+                         double reach_probability) {
+    if (game_state->end_of_game()) {
       // If it is terminal, it is not a decision node.
       // So therefore just return EVs here.
-      return node->state_.calculate_ev();
+      return game_state->calculate_ev();
     }
 
     if (auto chance_node = dynamic_cast<ChanceNode*>(node)) {
       // next_node is a decision node - after dealing cards.
-      Node* next_node = chance_node->GetChild();
-      return recurse(next_node, reach_probability);
+      Node* next_node = chance_node->GetNextNodeAndState(game_state);
+      return recurse(next_node, game_state, reach_probability);
     }
 
     // This returns the EVs for all players but we only calculate the regret for
     // hero here. The rest we just pass back.
     vector<double> average_ev(num_players_);
-    int hero = node->state_.get_next_to_act();
+    int hero = game_state->get_next_to_act();
+    int handhash = hand_hash(game_state->players_[game_state->get_next_to_act()].get_hand());
+
 
     // Calculate regret for hero.
     unordered_map<HandAction, double> action_ev;
     unordered_map<HandAction, int> action_count;
 
-    int num_simulations = 1;
-    for (int i = 0; i < num_simulations; i++) {
-      auto [next_action, action_probability] = node->GetNextAction();
-      Node* next = node->GetChild(next_action);
+    int num_simulations = 2;
+     for (int i = 0; i < num_simulations; i++) {  
+        GameState state_copy = *game_state;
 
-      vector<double> sample_ev =
-          recurse(next, reach_probability * action_probability);
+        auto [next_action, action_probability] = node->GetNextAction(&state_copy, handhash);
+        Node* next = node->GetNextNodeAndState(&state_copy, next_action); // advances game_state 
 
-      for (int j = 0; j < num_players_; j++) {
-        average_ev[j] += sample_ev[j];
-      }
+        vector<double> sample_ev = recurse(next, &state_copy, reach_probability * action_probability);
+        for (int j = 0; j < num_players_; j++) {
+          average_ev[j] += sample_ev[j];
+        }
 
-      action_ev[next_action] += sample_ev[hero];
-      action_count[next_action]++;
+        action_ev[next_action] += sample_ev[hero];
+        action_count[next_action]++;
     }
 
     // Convert to average
@@ -92,7 +97,7 @@ class Simulation {
     }
 
     // This is the strategy for 'next_to_act', at the current NODE.
-    node->AdjustStrategy(action_ev, hero, reach_probability);
+    node->AdjustStrategy(game_state, action_ev, handhash, reach_probability);
 
     return average_ev;
   }
@@ -123,40 +128,12 @@ class Simulation {
 
     num_players_ = num_players;
 
-    root_ = new Node(flop1vec, flop2vec, num_players, stack_depth, ante);
+    // Node(flop1vec, flop2vec, num_players, stack_depth,
+    // ante);
+    game_state_ =
+        new GameState(flop1vec, flop2vec, num_players, stack_depth, ante);
+    root_ = new Node(game_state_->get_next_to_act());
     focus_ = root_;
-
-    // for (int i = 0; i < 10000; i++) {
-    //   focus_->reset(); // re-deals everyone cards.
-    //   recurse(head);
-    //   cout << i << endl;
-    // }
-
-    // Deal out cards randomly.
-    // Recurse.
-    // If a particular node is terminal, then calculate the amount of money the
-    // hand gets. Adjust regrets accordingly.
-
-    // For all possible actions from head:
-    // Recurse along those
-    // If a particular node is terminal, then return the amount of money that
-    // each hand gets.
-
-    // cout << "OK" << endl;
-    // cout << focus_->strategy.size() << endl;
-
-    // // vector<pair<HandAction, double>> strat =
-    // head->strategy[hand_hash(string_to_cards("8d8cKhKs"))];
-    // // vector<pair<HandAction, double>> strat =
-    // head->strategy[hand_hash(string_to_cards("ThAh3s4s"))];
-
-    // for (const auto &[hand_hash, strat] : head->strategy) {
-    //   cout << "Hand: " << hand_hash_to_string(hand_hash) << endl;
-    //   for (const auto &[action, probability] : strat) {
-    //     cout << "Action " << action << " taken with probability " <<
-    //     probability << endl;
-    //   }
-    // }
   }
 
   // you should run this in a separate thread.
@@ -183,8 +160,13 @@ class Simulation {
       lock.unlock();
       // recurse only from the root.
       // add functionality later for switching recursion basepoint.
-      root_->state_.reset();
-      recurse(root_, 1.0);
+
+      // GameState* state = new GameState()
+
+      // game_state = root_state_;//copy
+      // root_->state_.reset();
+      game_state_->reset();
+      recurse(root_, game_state_, 1.0);
       // focus_->state_.reset();
       // recurse(focus_, 1.0);
     }

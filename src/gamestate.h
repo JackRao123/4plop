@@ -314,4 +314,36 @@ class GameState {
     }
     return evs;
   }
+
+  // Obtains the uniform (default) strategy for the current next-to-act player.
+  // Each allowed action has equal probability
+  vector<pair<HandAction, double>> GetUniformStrategy() {
+    Player player = players_[next_to_act_];
+
+    if (player.is_folded() || player.is_all_in()) {
+      return {{NOTHING, 1.0}};
+    }
+
+    vector<HandAction> available;
+
+    // pot/repot (same thing).
+    // player can reraise as long as they can afford more than just calling.
+    if (player.get_money() >= calculate_call(next_to_act_)) {
+      available.push_back(POT);
+    }
+
+    if (previous_aggressor_ == -1) {
+      available.push_back(CHECK);
+    } else {
+      available.push_back(FOLD);
+      available.push_back(CALL);
+    }
+
+    vector<pair<HandAction, double>> strat;
+    for (const auto& action : available) {
+      strat.push_back({action, 1.0 / (double)available.size()});
+    }
+
+    return strat;
+  }
 };

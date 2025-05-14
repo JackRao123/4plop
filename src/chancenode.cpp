@@ -8,16 +8,15 @@
 
 using namespace std;
 
-// GetChild deals out the next street, and then returns a decision node.
-Node* ChanceNode::GetChild() {
-  GameState next_state = state_;
-  pair<int, int> dealt_cards = next_state.next_street();
+
+Node* ChanceNode::GetNextNodeAndState(GameState* game_state) {
+  pair<int, int> dealt_cards = game_state->next_street();
 
   Node* child;
   if (next_.find(dealt_cards) != next_.end()) {
     child = next_[dealt_cards];
   } else {
-    child = new Node();
+    child = new Node(game_state->get_next_to_act());
     child->parent = this;
     next_[dealt_cards] = child;
   }
@@ -25,7 +24,7 @@ Node* ChanceNode::GetChild() {
   // have to update the state no matter what -
   // even though action sequences are the same, we must change what cards the
   // players have between runs.
-  child->state_ = next_state;
+  // child->state_ = next_state;
   return child;
 }
 

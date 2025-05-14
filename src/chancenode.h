@@ -25,13 +25,11 @@ class ChanceNode : public Node {
  private:
   unordered_map<pair<int, int>, Node*, PairHash, PairEq> next_;
 
-  GameState state_;
-
  public:
-  ChanceNode(GameState state) : state_(state) {}
-
-  // GetChild deals out the next street, and then returns a decision node.
-  Node* GetChild();
+  ChanceNode(int table_position) : Node(table_position) {}
+  // GetNextNodeAndState advances both the game state and the current node, by
+  // dealing out the next street
+  Node* GetNextNodeAndState(GameState* game_state);
 
   Node* GetNextNode(int next_top_card, int next_bottom_card);
 };

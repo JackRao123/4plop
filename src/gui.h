@@ -239,9 +239,9 @@ class View {
       if (ImGui::BeginTable("table1", 6)) {
         // Display the strategy for this node.
 
-        for (const auto& [hand_hash, strat] : node_strategy) {
+        for (const auto& [handhash, strat] : node_strategy) {
           // search filter.
-          string hand_string = hand_hash_to_string(hand_hash);
+          string hand_string = hand_hash_to_string(handhash);
           if (hand_string.find(search_term) == string::npos) {
             continue;
           }
@@ -268,7 +268,9 @@ class View {
           ImGui::Text("Nothing: %f", strategymap[HandAction::NOTHING]);
 
           ImGui::TableSetColumnIndex(5);
-          ImGui::Text("Visits: %f", focus->visit_count_[hand_hash]);
+          auto it = focus->visit_count_.find(handhash);
+          
+          ImGui::Text("Visits: %f", ( it != focus->visit_count_.end())?it->second:0.0f );
 
           strategy_rows_displayed++;
           if (strategy_rows_displayed >= strategy_max_rows) {
