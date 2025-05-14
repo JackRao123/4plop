@@ -249,27 +249,40 @@ public:
 			ImGui::Separator();
 
 			Node* focus = simulation_.GetFocus();
-			
+
 
 			// !!!
 			// reference, or directly iterating through focus->strategy is much faster
 			// copying, or using a mutex, is quite slow.
 			// fastest way is probably to use a mutex and iterate through the map (because we are only displaying like 50 at a time).
-			unordered_map<int, vector<pair<HandAction, double>>> & node_strategy = focus->strategy;
+			unordered_map<int, vector<pair<HandAction, double>>>& node_strategy = focus->strategy;
 			//{
 			//	lock_guard<mutex> lock(focus->mtx);
 			//	node_strategy = focus->strategy;
 			//}
 
+
+
 			ImGui::Text("Current node: %s, hands: %d", focus->GetTablePosition().c_str(), node_strategy.size());
+
+			static char buf_search[128] = "";
+			ImGui::InputText("Search", buf_search, IM_ARRAYSIZE(buf_search));
+			string search_term = string(buf_search);
+
 			if (ImGui::BeginTable("table1", 6)) {
 				// Display the strategy for this node.
 
 				for (const auto& [hand_hash, strat] : node_strategy) {
+					// search filter.
+					string hand_string = hand_hash_to_string(hand_hash);
+					if (hand_string.find(search_term) == string::npos) {
+						continue;
+					}
+
 					ImGui::TableNextRow();
 
 					ImGui::TableSetColumnIndex(0);
-					ImGui::Text("Hand: %s", hand_hash_to_string(hand_hash).c_str());
+					ImGui::Text("Hand: %s", hand_string.c_str());
 
 					unordered_map<HandAction, double> strategymap(strat.begin(), strat.end());
 
