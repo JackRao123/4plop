@@ -1,24 +1,16 @@
-#ifndef SIMULATION_H
-#define SIMULATION_H
-#include "equity_calc.h"
-#include "include/phevaluator.h"
-#include "node.h"
-#include "chancenode.h"
-#include "player.h"
-#include <algorithm>
+#pragma once
+
 #include <chrono>
-#include <filesystem>
-#include <fstream>
-#include <iomanip>
+#include <exception>
 #include <iostream>
 #include <mutex>
-#include <numeric>
-#include <random>
 #include <set>
-#include <sstream>
+#include <string>
 #include <thread>
-#include <unordered_set>
 #include <vector>
+
+#include "chancenode.h"
+#include "node.h"
 
 enum SimulationState { RUNNING, PAUSED, STOPPED };
 
@@ -238,5 +230,3 @@ public:
 	// GetRoot returns the root of the game tree. The root never changes.
 	Node* GetRoot() { return root_; }
 };
-
-#endif

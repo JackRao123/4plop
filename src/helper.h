@@ -1,14 +1,13 @@
-#ifndef HELPER_H
-#define HELPER_H
-#include "include/phevaluator.h"
+#pragma once
+
 #include <algorithm>
-#include <chrono>
-#include <iostream>
-#include <numeric>
+#include <cmath>
 #include <random>
-#include <set>
-#include <unordered_set>
+#include <stdexcept>
+#include <string>
 #include <vector>
+
+#include "include/phevaluator.h"
 
 using namespace std;
 
@@ -73,5 +72,3 @@ inline string hand_hash_to_string(int hash) {
 
 	return hand_to_string(hand);
 }
-
-#endif

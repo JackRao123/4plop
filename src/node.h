@@ -1,21 +1,14 @@
 // node.h
-#pragma once 
-#include "include/phevaluator.h"
-#include "player.h"
-#include "gamestate.h"
-#include <algorithm>
-#include <chrono>
-#include <filesystem>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <numeric>
-#include <random>
-#include <set>
-#include <sstream>
-#include <unordered_set>
+#pragma once
+
+#include <unordered_map>
 #include <vector>
 #include <mutex>
+#include <string>
+#include <utility>
+
+#include "gamestate.h"
+
 
 #define MAX_UNIQUE_HANDS 52 * 52 * 52 * 52
 
@@ -46,19 +39,12 @@ public:
 	// How often you visited this info set (handhash -> total reach probability)
 	unordered_map<int, double> visit_count_;
 
-
-
-
 	// Traversal
 	unordered_map<HandAction, Node*> children;
 	Node* parent = nullptr;
 
 	// Game state. Should be copied (and then modified) when spawning children. 
 	GameState state_;
-
-
-
-
 
 	Node() {}
 	Node(const vector<int>& board1, const vector<int>& board2, int num_players, double stack_depth, double ante) {
@@ -69,13 +55,12 @@ public:
 
 	void AdjustStrategy(unordered_map<HandAction, double>& action_ev, int player_idx, double reach_probability);
 
-
 	// Default strategy for allowable actions at a decision point.
 	// Returns a strategy where each allowed action has equal probability
 	vector<pair<HandAction, double>> GetUniformStrategy(int player_idx);
 
+	// Gets the strategy for a particular player at this node 
 	vector<pair<HandAction, double>> GetStrategy(int player_idx);
-
 
 	// Randomises next action based on strategy probabilities.
 	// Doesn't perform the action.

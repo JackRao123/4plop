@@ -1,80 +1,21 @@
 // node.cpp
 #include "node.h"
-#include "chancenode.h"
-#include "include/phevaluator.h"
-#include "player.h"
-#include "gamestate.h"
+
+
+#include <array>
 #include <algorithm>
-#include <chrono>
-#include <filesystem>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <numeric>
-#include <random>
-#include <set>
-#include <sstream>
-#include <unordered_set>
-#include <vector>
 #include <cassert>
+#include <iostream>
+
+#include "include/phevaluator.h"
+
+
+#include "chancenode.h"
+#include "equity_calc.h"
+
+
 
 using namespace std;
-
-
-
-
-
-//// Calculates the correct filename for a given board1, board2, and actions
-//// Preconditions: board1, board2, and actions are already set.
-//// Syntax: CCCCC_CCCCC_AAAAAA.txt
-//// C = card, like Ah = Ace of hearts.
-//// A = action, enum in 0-9.
-//// e.g. AhAdAc_2h3h4s_00110.txt
-//string get_filename() {
-//	swap_boards_if_necessary();
-//	string filename = "";
-
-//	for (const auto& card : board1) {
-//		filename += phevaluator::Card(card).describeCard();
-//	}
-
-//	filename += "_";
-//	for (const auto& card : board2) {
-//		filename += phevaluator::Card(card).describeCard();
-//	}
-
-//	filename += "_";
-
-//	for (const auto& action : actions) {
-//		filename += string(1, action + '0');
-//	}
-
-//	filename += ".txt";
-
-//	return filename;
-//}
-
-
-
-
-
-
-//void print_strategy(const vector<int> hand, const vector<pair<HandAction, double>>& strat) {
-
-//	cout << "Hand: " << hand_to_string(hand) << endl;
-
-//	cout << "Actions: ";
-//	for (const HandAction& action : actions) {
-//		cout << action << " ";
-//	}
-//	cout << endl;
-
-//	cout << std::fixed << std::setprecision(3);
-//	for (const auto& [action, probability] : strat) {
-//		cout << action << " " << probability << " ";
-//	}
-//	cout << endl;
-//}
 
 // Adjust the strategy.
 // action_ev is the ev of various actions, performed by player_idx at this
@@ -123,8 +64,6 @@ void Node::AdjustStrategy(unordered_map<HandAction, double>& action_ev, int play
 	visit_count_[handhash] += reach_probability;
 }
 
-
-
 // Default strategy for allowable actions at a decision point.
 // Returns a strategy where each allowed action has equal probability
 vector<pair<HandAction, double>> Node::GetUniformStrategy(int player_idx) {
@@ -157,7 +96,6 @@ vector<pair<HandAction, double>> Node::GetUniformStrategy(int player_idx) {
 
 	return strat;
 }
-
 
 // GetStrategy finds the strategy for a particular player at this node, or sets it to the uniform strategy if it doesn't exist.
 vector<pair<HandAction, double>> Node::GetStrategy(int player_idx) {

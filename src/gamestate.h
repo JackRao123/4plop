@@ -1,22 +1,13 @@
-#ifndef GAMESTATE_H
-#define GAMESTATE_H
-#include "deck.h"
-#include "equity_calc.h"
-#include "include/phevaluator.h"
-#include "node.h"
-#include "player.h"
-#include <algorithm>
-#include <chrono>
-#include <filesystem>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <numeric>
-#include <random>
-#include <set>
-#include <sstream>
-#include <unordered_set>
+#pragma once
 #include <vector>
+#include <algorithm>   
+#include <exception>  
+#include <iostream>     
+#include <utility>      
+
+#include "deck.h"
+#include "player.h"
+#include "equity_calc.h"
 
 using namespace std;
 
@@ -314,5 +305,3 @@ public:
 		return evs;
 	}
 };
-
-#endif

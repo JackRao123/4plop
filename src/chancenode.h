@@ -1,23 +1,11 @@
 // chancenode.h 
 #pragma once 
-#include "node.h"
-#include "gamestate.h"
-#include <algorithm>
-#include <chrono>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <iomanip>
-#include <numeric>
-#include <random>
-#include <set>
-#include <sstream>
-#include <unordered_set>
-#include <vector>
+#include <unordered_map>   
+#include <utility>         
+#include "node.h"          
+#include "gamestate.h"     
 
 using namespace std;
-
-
 struct PairHash {
 	size_t operator()(const std::pair<int, int>& p) const noexcept {
 		// very simple hash function

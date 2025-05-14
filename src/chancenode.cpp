@@ -1,20 +1,10 @@
 // chancenode.cpp
 #include "chancenode.h"
-#include "include/phevaluator.h"
-#include "player.h"
-#include "gamestate.h"
+
 #include <algorithm>
-#include <chrono>
-#include <filesystem>
-#include <fstream>
-#include <iomanip>
-#include <iostream>
-#include <numeric>
-#include <random>
-#include <set>
-#include <sstream>
-#include <unordered_set>
-#include <vector>
+
+#include "gamestate.h"
+#include "node.h"
 
 using namespace std;
 

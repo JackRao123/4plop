@@ -1,27 +1,12 @@
-#include "deck.h"
-#include "equity_calc.h"
 #include "gui.h"
-#include "helper.h"
-#include "include/phevaluator.h"
-#include "node.h"
-#include "simulation.h"
-#include <algorithm>
-#include <chrono>
-#include <iostream>
-#include <numeric>
-#include <random>
-#include <set>
-#include <unordered_set>
-#include <vector>
 
 using namespace std;
-
 int main() {
 
-  View view;
-  view.Start();
+	View view;
+	view.Start();
 
-  return 0;
+	return 0;
 }
 
 // int main() {

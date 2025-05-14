@@ -1,43 +1,33 @@
-#ifndef PLAYER_H
-#define PLAYER_H
-#include "include/phevaluator.h"
-#include <algorithm>
-#include <chrono>
-#include <iostream>
-#include <numeric>
-#include <random>
-#include <set>
-#include <unordered_set>
+#pragma once
+
 #include <vector>
 
 using namespace std;
 
 class Player {
 public:
-  vector<int> hand;
-  double money;
+	vector<int> hand;
+	double money;
 
-  bool folded = false;
+	bool folded = false;
 
 public:
-  Player(const vector<int> &hand, double money) {
-    this->money = money;
-    this->hand = hand;
-  }
+	Player(const vector<int>& hand, double money) {
+		this->money = money;
+		this->hand = hand;
+	}
 
-  void fold() { folded = true; }
+	void fold() { folded = true; }
 
-  bool is_folded() { return folded; }
+	bool is_folded() { return folded; }
 
-  bool is_all_in() { return money < 0.001; }
+	bool is_all_in() { return money < 0.001; }
 
-  double get_money() { return money; }
+	double get_money() { return money; }
 
-  void subtract_money(double money) { this->money -= money; }
+	void subtract_money(double money) { this->money -= money; }
 
-  void add_money(double money) { this->money += money; }
+	void add_money(double money) { this->money += money; }
 
-  vector<int> get_hand() { return hand; }
+	vector<int> get_hand() { return hand; }
 };
-
-#endif

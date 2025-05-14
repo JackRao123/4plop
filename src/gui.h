@@ -1,53 +1,18 @@
-#ifndef GUI_H
-#define GUI_H
+#pragma once
 
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <utility>
+#include <exception>
+
+#include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
-#include "imgui.h"
-#include <utility>
-#include <mutex>
-
-#include "simulation.h"
 #include <GLFW/glfw3.h>
 
-// --- MVC pattern ---
-
-// class Model {}; "Simulation" is out model
-
-// class Controller {
-// private:
-//   Simulation &simulation_;
-
-//   // GUI node ID, to solver Node*
-//   unordered_map<int, Node *> gui_node_to_solver_node_;
-
-// public:
-//   Controller() : simulation_(Simulation()) {}
-
-//   void Solve(const string &flop1, const string &flop2) {
-//     int num_players = 6;
-//     double stack_depth = 50.0;
-//     double ante = 5.0;
-
-//     vector<int> flop1vec = string_to_hand(flop1);
-//     vector<int> flop2vec = string_to_hand(flop2);
-
-//     simulation_.initialise(flop1vec, flop2vec, num_players, stack_depth, ante);
-//     simulation_.StartSolver();
-//   }
-
-//   vector<HandAction> OnNodeClicked(int node_id) {
-//     Node *solver_node = gui_node_to_solver_node_[node_id];
-//     simulation_.ChangeRoot(solver_node);
-//     vector<HandAction> actions = solver_node->actions;
-
-//     return actions;
-//   }
-
-//   Node * GetNextNode()
-// };
-
-// controller is so redundant i find that i am just bouncing back n forth Controller and View.
+#include "simulation.h"
+#include "node.h"
 
 class View {
 private:
@@ -287,7 +252,7 @@ public:
 					unordered_map<HandAction, double> strategymap(strat.begin(), strat.end());
 
 					ImGui::TableSetColumnIndex(1);
-					ImGui::Text("Check/Call: %f", strategymap[HandAction::CHECK] +  strategymap[HandAction::CALL]);
+					ImGui::Text("Check/Call: %f", strategymap[HandAction::CHECK] + strategymap[HandAction::CALL]);
 
 					ImGui::TableSetColumnIndex(2);
 					ImGui::Text("Pot: %f", strategymap[HandAction::POT]);
@@ -340,5 +305,3 @@ public:
 		}
 	}
 };
-
-#endif

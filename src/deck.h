@@ -1,15 +1,13 @@
-#ifndef DECK_H
-#define DECK_H
+#pragma once
 
-#include "include/phevaluator.h"
+#include <vector>
+#include <random>
 #include <algorithm>
 #include <chrono>
-#include <iostream>
-#include <numeric>
-#include <random>
-#include <set>
 #include <unordered_set>
-#include <vector>
+#include <unordered_map>
+#include <iterator>
+#include <stdexcept>
 
 using namespace std;
 
@@ -140,5 +138,3 @@ public:
 		shuffle();
 	}
 };
-
-#endif
