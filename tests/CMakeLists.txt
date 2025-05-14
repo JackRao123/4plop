@@ -4,6 +4,7 @@ enable_testing()
 # Collect test sources
 set(TEST_SOURCES
     node_test.cpp
+    equity_calc_test.cpp
     # Add more test files here
 )
 

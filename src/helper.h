@@ -17,28 +17,31 @@ using namespace std;
 
 // When evaluated, we get a rank. Lower ranks are better.
 
-inline string hand_to_string(const vector<int>& hand) {
+// cards_to_string converts a vector of cards of any length to a string
+// representation
+inline string cards_to_string(const vector<int>& cards) {
   string s;
 
-  for (const auto& h : hand) {
-    s += phevaluator::Card(h).describeCard();
+  for (const auto& c : cards) {
+    s += phevaluator::Card(c).describeCard();
   }
 
   return s;
 }
 
-// Takes a string like Ac9h3d etc
-inline vector<int> string_to_hand(string s) {
-  vector<int> hand;
+// string_to_cards converts a string representation of a set of cards of any
+// length, to a vector for example AcAdKc -> {x,y,z}
+inline vector<int> string_to_cards(string s) {
+  vector<int> cards;
   if (s.size() % 2 != 0) {
-    throw runtime_error("Hand string length be divisible by 2.");
+    throw runtime_error("Card set string length be divisible by 2.");
   }
 
   for (int i = 0; i < s.size(); i = i + 2) {
     string card = s.substr(i, 2);
-    hand.push_back(phevaluator::Card(card));
+    cards.push_back(phevaluator::Card(card));
   }
-  return hand;
+  return cards;
 }
 
 // Random double range [min, max]
@@ -70,5 +73,5 @@ inline string hand_hash_to_string(int hash) {
     hash = hash % (int)pow(52, i);
   }
 
-  return hand_to_string(hand);
+  return cards_to_string(hand);
 }

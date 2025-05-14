@@ -110,8 +110,8 @@ class Simulation {
       throw exception("Flop 2 is not correctly specified.");
     }
 
-    vector<int> flop1vec = string_to_hand(flop1);
-    vector<int> flop2vec = string_to_hand(flop2);
+    vector<int> flop1vec = string_to_cards(flop1);
+    vector<int> flop2vec = string_to_cards(flop2);
 
     set<int> unique_cards;
     unique_cards.insert(flop1vec.begin(), flop1vec.end());
@@ -146,9 +146,9 @@ class Simulation {
     // cout << focus_->strategy.size() << endl;
 
     // // vector<pair<HandAction, double>> strat =
-    // head->strategy[hand_hash(string_to_hand("8d8cKhKs"))];
+    // head->strategy[hand_hash(string_to_cards("8d8cKhKs"))];
     // // vector<pair<HandAction, double>> strat =
-    // head->strategy[hand_hash(string_to_hand("ThAh3s4s"))];
+    // head->strategy[hand_hash(string_to_cards("ThAh3s4s"))];
 
     // for (const auto &[hand_hash, strat] : head->strategy) {
     //   cout << "Hand: " << hand_hash_to_string(hand_hash) << endl;

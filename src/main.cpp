@@ -11,9 +11,9 @@ int main() {
 // int main() {
 //   Deck d;
 
-//   vector<int> flop1 = string_to_hand("JcQdKc");
-//   vector<int> flop2 = string_to_hand("8s2h5s");
-//   vector<int> hand = string_to_hand("ThAh3s4s");
+//   vector<int> flop1 = string_to_cards("JcQdKc");
+//   vector<int> flop2 = string_to_cards("8s2h5s");
+//   vector<int> hand = string_to_cards("ThAh3s4s");
 
 //   d.erase(flop1);
 //   d.erase(flop2);

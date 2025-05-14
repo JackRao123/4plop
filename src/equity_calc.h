@@ -99,10 +99,10 @@ inline void multiway_equity_calc(vector<int> hand, vector<int> flop1,
   cout << "Iterations: " << num_iterations << endl;
   cout << "Players: " << num_players << endl;
 
-  cout << "Flop1 : " << hand_to_string(flop1) << endl;
-  cout << "Flop2 : " << hand_to_string(flop2) << endl;
+  cout << "Flop1 : " << cards_to_string(flop1) << endl;
+  cout << "Flop2 : " << cards_to_string(flop2) << endl;
 
-  cout << "Hero Hand: " << hand_to_string(hand) << endl;
+  cout << "Hero Hand: " << cards_to_string(hand) << endl;
 
   cout << "Equity: " << sum_eq / (double)num_iterations << endl;
 }
@@ -137,7 +137,7 @@ inline void multiway_equity_calc() {
   cout << "Iterations: " << num_iterations << endl;
   cout << "Players: " << num_players << endl;
   for (int i = 0; i < num_players; i++) {
-    cout << "Player " << i << ": Hand = " << hand_to_string(hands[i])
+    cout << "Player " << i << ": Hand = " << cards_to_string(hands[i])
          << "| Equity = " << sum_eq[i] / (double)num_iterations << endl;
   }
 }
@@ -205,10 +205,10 @@ inline int equity_calc() {
     sum_eq2 += eq2;
   }
 
-  cout << hand_to_string(h1) << " has equity "
+  cout << cards_to_string(h1) << " has equity "
        << sum_eq1 / (double)num_iterations << endl;
 
-  cout << hand_to_string(h2) << " has equity "
+  cout << cards_to_string(h2) << " has equity "
        << sum_eq2 / (double)num_iterations << endl;
 
   cout << "Chop board 1 " << chop1 << "/" << num_iterations << " times "
