@@ -47,7 +47,7 @@ class Node {
 
   int table_position_;
 
- Node(int table_position): table_position_(table_position) {}
+  Node(int table_position) : table_position_(table_position) {}
   // Node(const vector<int>& board1, const vector<int>& board2, int num_players,
   //      double stack_depth, double ante) {
   //   state_ = GameState(board1, board2, num_players, stack_depth, ante);
@@ -55,13 +55,10 @@ class Node {
 
   virtual ~Node() = default;
 
-  void AdjustStrategy(GameState* game_state,
-                      unordered_map<HandAction, double>& action_ev,
-                      int handhash, double reach_probability);
+  void AdjustStrategy(GameState* game_state, unordered_map<HandAction, double>& action_ev, int handhash, double reach_probability);
 
   // Gets the strategy for a particular hand at this node
-  vector<pair<HandAction, double>> GetStrategy(GameState* game_state,
-                                               int handhash);
+  vector<pair<HandAction, double>> GetStrategy(GameState* game_state, int handhash);
 
   // Randomises next action based on strategy probabilities.
   // Doesn't perform the action.

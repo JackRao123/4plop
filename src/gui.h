@@ -75,10 +75,11 @@ class View {
   }
 
   // UI code
-  void Solve(const string& flop1, const string& flop2) {
-    int num_players = 6;
-    double stack_depth = 50.0;
-    double ante = 5.0;
+  void Solve(const string& flop1, const string& flop2, int num_players,
+             double stack_depth, double ante) {
+    // int num_players = 6;
+    // double stack_depth = 50.0;
+    // double ante = 5.0;
 
     simulation_.initialise(flop1, flop2, num_players, stack_depth, ante);
     simulation_.StartSolver();
@@ -170,15 +171,21 @@ class View {
     static char buf_flop2[128] = "2s3s5h";
     ImGui::InputText("Board 2", buf_flop2, IM_ARRAYSIZE(buf_flop2));
 
-    // static char buf_hand[128] = "";
-    // ImGui::InputText("Hand", buf_hand, IM_ARRAYSIZE(buf_hand));
+    static int buf_num_players = 2;
+    ImGui::InputInt("Num players", &buf_num_players);
+
+    static double buf_stack_depth = 50.0;
+    ImGui::InputDouble("Stack depth", &buf_stack_depth);
+
+    static double buf_ante = 5.0;
+    ImGui::InputDouble("Ante", &buf_ante);
 
     if (ImGui::Button("Solve")) {
       string flop1_str(buf_flop1);
       string flop2_str(buf_flop2);
 
       try {
-        Solve(flop1_str, flop2_str);
+        Solve(flop1_str, flop2_str, buf_num_players, buf_stack_depth, buf_ante);
       } catch (const exception& e) {
         last_error_message_ = e.what();
       }
@@ -269,8 +276,9 @@ class View {
 
           ImGui::TableSetColumnIndex(5);
           auto it = focus->visit_count_.find(handhash);
-          
-          ImGui::Text("Visits: %f", ( it != focus->visit_count_.end())?it->second:0.0f );
+
+          ImGui::Text("Visits: %f",
+                      (it != focus->visit_count_.end()) ? it->second : 0.0f);
 
           strategy_rows_displayed++;
           if (strategy_rows_displayed >= strategy_max_rows) {

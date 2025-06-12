@@ -45,8 +45,7 @@ class Simulation {
   // reach_probability: probability of reaching node.
   // Returns:
   // Vector of EVs for each player.
-  vector<double> recurse(Node* node, GameState* game_state,
-                         double reach_probability) {
+  vector<double> recurse(Node* node, GameState* game_state, double reach_probability) {
     if (game_state->end_of_game()) {
       // If it is terminal, it is not a decision node.
       // So therefore just return EVs here.
@@ -65,25 +64,24 @@ class Simulation {
     int hero = game_state->get_next_to_act();
     int handhash = hand_hash(game_state->players_[game_state->get_next_to_act()].get_hand());
 
-
     // Calculate regret for hero.
     unordered_map<HandAction, double> action_ev;
     unordered_map<HandAction, int> action_count;
 
-    int num_simulations = 2;
-     for (int i = 0; i < num_simulations; i++) {  
-        GameState state_copy = *game_state;
+    int num_simulations = 1;
+    for (int i = 0; i < num_simulations; i++) {
+      GameState state_copy = *game_state;
 
-        auto [next_action, action_probability] = node->GetNextAction(&state_copy, handhash);
-        Node* next = node->GetNextNodeAndState(&state_copy, next_action); // advances game_state 
+      auto [next_action, action_probability] = node->GetNextAction(&state_copy, handhash);
+      Node* next = node->GetNextNodeAndState(&state_copy, next_action);  // advances game_state
 
-        vector<double> sample_ev = recurse(next, &state_copy, reach_probability * action_probability);
-        for (int j = 0; j < num_players_; j++) {
-          average_ev[j] += sample_ev[j];
-        }
+      vector<double> sample_ev = recurse(next, &state_copy, reach_probability * action_probability);
+      for (int j = 0; j < num_players_; j++) {
+        average_ev[j] += sample_ev[j];
+      }
 
-        action_ev[next_action] += sample_ev[hero];
-        action_count[next_action]++;
+      action_ev[next_action] += sample_ev[hero];
+      action_count[next_action]++;
     }
 
     // Convert to average
@@ -103,11 +101,7 @@ class Simulation {
   }
 
   // Entry point
-  // void initialise(const vector<int> &flop1, const vector<int> &flop2, int
-  // num_players, double stack_depth,
-  //                 double ante) {
-  void initialise(const string& flop1, const string& flop2, int num_players,
-                  double stack_depth, double ante) {
+  void initialise(const string& flop1, const string& flop2, int num_players, double stack_depth, double ante) {
     if (flop1.size() != 6) {
       throw exception("Flop 1 is not correctly specified.");
     }
@@ -130,8 +124,7 @@ class Simulation {
 
     // Node(flop1vec, flop2vec, num_players, stack_depth,
     // ante);
-    game_state_ =
-        new GameState(flop1vec, flop2vec, num_players, stack_depth, ante);
+    game_state_ = new GameState(flop1vec, flop2vec, num_players, stack_depth, ante);
     root_ = new Node(game_state_->get_next_to_act());
     focus_ = root_;
   }
